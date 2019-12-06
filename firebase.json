@@ -1,0 +1,45 @@
+{
+  "hosting": {
+    "public": "./",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**",
+      "firestore-db/data-collector-firestore-firebase-adminsdk-kmioe-333e3d459d.json"
+    ],
+    "headers": [{
+      "source": "**/*.@(json|geojson|html)",
+      "headers": [{
+        "key": "Cache-Control",
+        "value": "max-age=60"
+      }]
+    },{
+      "source": "/css/style.css",
+      "headers": [{
+        "key": "Cache-Control",
+        "value": "max-age=60"
+      }]
+    },
+    {
+      "source": "/css/spectre.min.css",
+      "headers": [{
+        "key": "Cache-Control",
+        "value": "max-age=60"
+      }]
+    },
+    {
+      "source": "/js/app.js",
+      "headers": [{
+        "key": "Cache-Control",
+        "value": "max-age=60"
+      }]
+    },{
+      "source": "index.html",
+      "headers": [{
+        "key": "Cache-Control",
+        "value": "max-age=60"
+      }]
+    }
+    ]
+  }
+}
