@@ -696,7 +696,7 @@ function mapInit(id, project, data) {
 
   function dbCreatePoint(position) {
     console.log(position)
-    var coords = (position.coords) ? [position.coords.longitude,position.coords.longitude] : (position.lngLat) ? [position.lngLat.lng, position.lngLat.lat] : false;
+    var coords = (position.coords) ? [position.coords.longitude,position.coords.latitude] : (position.lngLat) ? [position.lngLat.lng, position.lngLat.lat] : false;
     if (!coords) return
     var positionAccuracy = (!position.coords) ? 9999 : (position.coords.accuracy  * 3.28084).toFixed(2);
     loaders[0].style.display = "none";
@@ -709,7 +709,7 @@ function mapInit(id, project, data) {
       };
 
     //TODO CHANGE TO CONFIG SETTING//
-    if (positionAccuracy < 10) {
+    if (positionAccuracy < 4) {
         coords = rtkTransform(coords);
         properties.rtk = "true"
       }else{
@@ -726,14 +726,9 @@ function mapInit(id, project, data) {
         }
       };
 
-      featureEditFormBuilder(newFeature)
-      // points.features.push(newFeature)
-      // map.getSource("projectPoints").setData(points)
-      // var firebaseGeoJSON = {
-      //   xy: coords,
-      //   p: properties
-      // }
-      // console.log(firebaseGeoJSON)
+
+      featureEditFormBuilder(newFeature);
+
       // dbWriteGeoJSON(pointFirebaseString, firebaseGeoJSON, null, dbWriteCallback)
     } else {
       alert(positionAccuracy)
@@ -917,7 +912,7 @@ function mapInit(id, project, data) {
   function featureEditFormBuilder(feature) {
     var fields = feature.properties;
     var geometry = feature.geometry.coordinates;
-    var layer = (feature.layer.id === "lines") ? "test-lines2": "test-points2";
+    // var layer = (feature.layer.id === "lines") ? "test-lines2": "test-points2";
 
     document.getElementById("edit").querySelector(".content").children[0].remove()
 
@@ -999,7 +994,6 @@ function mapInit(id, project, data) {
       for (var i = 0; i < keys.length; i++) {
         properties[keys[i]] = values[i]
       }
-      console.log(featureSelected.properties)
       //CHECK IF EDITS HAVE BEEN MADE, IF NOT WHEN CLICKING SUBMIT SIMPLY RETURN AND DO NOT EDIT SAVE THE NON EDITS
       if (propertiesCompare(featureSelected.properties, properties)) {
         window.location.hash = "close"
@@ -1007,9 +1001,10 @@ function mapInit(id, project, data) {
       }
 
       var key = (!properties.k) ? null : properties.k;
-      if (feature.layer.id === "lines") {
+      if (feature.layer.id === "projectLines") {
         geometry = [geometry[0][0], geometry[0][1], geometry[1][0], geometry[1][1]]
       }
+      console.log(geometry)
       var firebaseGeoJSON = {
         xy: geometry,
         p: properties
