@@ -1,6 +1,6 @@
 {
   "hosting": {
-    "public": "./",
+    "public": "./public",
     "ignore": [
       "firebase.json",
       "**/.*",
@@ -11,33 +11,33 @@
       "source": "**/*.@(json|geojson|html)",
       "headers": [{
         "key": "Cache-Control",
-        "value": "max-age=60"
+        "value": "max-age=0"
       }]
     },{
       "source": "/css/style.css",
       "headers": [{
         "key": "Cache-Control",
-        "value": "max-age=60"
+        "value": "max-age=0"
       }]
     },
     {
       "source": "/css/spectre.min.css",
       "headers": [{
         "key": "Cache-Control",
-        "value": "max-age=60"
+        "value": "max-age=0"
       }]
     },
     {
       "source": "/js/app.js",
       "headers": [{
         "key": "Cache-Control",
-        "value": "max-age=60"
+        "value": "max-age=0"
       }]
     },{
       "source": "index.html",
       "headers": [{
         "key": "Cache-Control",
-        "value": "max-age=60"
+        "value": "max-age=0"
       }]
     }
     ]
