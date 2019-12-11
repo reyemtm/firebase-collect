@@ -11,33 +11,33 @@
       "source": "**/*.@(json|geojson|html)",
       "headers": [{
         "key": "Cache-Control",
-        "value": "max-age=0"
+        "value": "max-age=10"
       }]
     },{
       "source": "/css/style.css",
       "headers": [{
         "key": "Cache-Control",
-        "value": "max-age=0"
+        "value": "max-age=10"
       }]
     },
     {
       "source": "/css/spectre.min.css",
       "headers": [{
         "key": "Cache-Control",
-        "value": "max-age=0"
+        "value": "max-age=10"
       }]
     },
     {
-      "source": "/js/app.js",
+      "source": "**/*.js",
       "headers": [{
         "key": "Cache-Control",
-        "value": "max-age=0"
+        "value": "max-age=10"
       }]
     },{
       "source": "index.html",
       "headers": [{
         "key": "Cache-Control",
-        "value": "max-age=0"
+        "value": "max-age=10"
       }]
     }
     ]

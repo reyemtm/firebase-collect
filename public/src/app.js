@@ -270,7 +270,7 @@ function mapInit(id, project, data) {
     // 
 
     function featuresGetData(database, source) {
-      loaders[0].style.display = 'block';
+      map.getSource("highlight").setData(turf.featureCollection([]))
       dbGet(database)
         .then(function (data) {
           var geojson = dbToGeoJSON(data)
@@ -293,7 +293,7 @@ function mapInit(id, project, data) {
     dbListener.limitToLast(1).on("child_added", function (snapshot) {
       console.log("child_added fired")
       if (featureAdded === true) {
-        loaders[1].style.display = "block";
+        // loaders[1].style.display = "block";
         console.log("new point added")
         var firebasePoint = snapshot.val();
         console.log(firebasePoint)
@@ -317,7 +317,7 @@ function mapInit(id, project, data) {
     dbListener2.limitToLast(1).on("child_added", function (snapshot) {
       console.log("child_added fired")
       if (featureAdded === true) {
-        loaders[1].style.display = "block";
+        // loaders[1].style.display = "block";
         console.log("new line added")
         var firebaseLine = snapshot.val();
         console.log(firebaseLine)
@@ -696,8 +696,12 @@ function mapInit(id, project, data) {
 
   function dbCreatePoint(position) {
     console.log(position)
+
     var coords = (position.coords) ? [position.coords.longitude,position.coords.latitude] : (position.lngLat) ? [position.lngLat.lng, position.lngLat.lat] : false;
+    document.getElementById("position").innerText = JSON.stringify(coords);
+    
     if (!coords) return
+    
     var positionAccuracy = (!position.coords) ? 9999 : (position.coords.accuracy  * 3.28084).toFixed(2);
     loaders[0].style.display = "none";
     if (positionAccuracy > 0 && positionAccuracy < 20000) {
@@ -912,6 +916,7 @@ function mapInit(id, project, data) {
   function featureEditFormBuilder(feature) {
     var fields = feature.properties;
     var geometry = feature.geometry.coordinates;
+    var deleteFeature = false;
     // var layer = (feature.layer.id === "lines") ? "test-lines2": "test-points2";
 
     document.getElementById("edit").querySelector(".content").children[0].remove()
@@ -969,24 +974,20 @@ function mapInit(id, project, data) {
 
     form.appendChild(button);
 
-    form.addEventListener("click", function(e) {
-      console.log(this.childNodes)
-      if (e.target.type === "button" || e.target.classList.contains("icon-plus")) {
-        var x = this.children.length - 2;
-        var input = document.createElement("div");
-        input.classList = "form-group";
-        input.innerHTML = `
-          <label class="form-label" for="custom_field_${x}">Custom Field ${x}</label>
-          <input class="form-input" type="text" value="" placeholder="" name="custom_field_${x}">
-        `
-        this.insertBefore(input, this.childNodes[this.children.length - 3])
-      }
-    })
-
     form.innerHTML += `<br><input class="form-input btn btn-success float-left" style="width:30%" type="submit" value="Submit"><a href="#close"><input class="form-input btn btn-outline float-right" style="width:30%" type="button" value="Cancel"></a></div>`
+
+    form.innerHTML += `<br><br><input class="form-input btn btn-sm btn-error float-left" type="submit" value="Delete Feature"></input>`
 
     form.onsubmit = function (e) {
       e.preventDefault();
+      // if (deleteFeature) {
+      //   var areusure = confirm("Are you sure you want to delete the feature?")
+      //   if (areusure != true) {
+      //     window.location.hash = "close"
+      //     return
+      //   }
+      // }
+
       var properties = {};
       var data = new URLSearchParams(new FormData(this))
       var keys = [...data.keys()];
@@ -994,8 +995,9 @@ function mapInit(id, project, data) {
       for (var i = 0; i < keys.length; i++) {
         properties[keys[i]] = values[i]
       }
+
       //CHECK IF EDITS HAVE BEEN MADE, IF NOT WHEN CLICKING SUBMIT SIMPLY RETURN AND DO NOT EDIT SAVE THE NON EDITS
-      if (propertiesCompare(featureSelected.properties, properties)) {
+      if (!deleteFeature && propertiesCompare(featureSelected.properties, properties)) {
         window.location.hash = "close"
         return
       }
@@ -1009,9 +1011,26 @@ function mapInit(id, project, data) {
         xy: geometry,
         p: properties
       }
+      if (deleteFeature) firebaseGeoJSON.delete = true;
       console.log(firebaseGeoJSON)
       dbWriteGeoJSON(pointFirebaseString, firebaseGeoJSON, key, dbWriteCallback)
     };
+
+    form.addEventListener("click", function(e) {
+      if (e.target.type === "button" || e.target.classList.contains("icon-plus")) {
+        var x = this.children.length - 2;
+        var input = document.createElement("div");
+        input.classList = "form-group";
+        input.innerHTML = `
+          <label class="form-label" for="custom_field_${x}">Custom Field ${x}</label>
+          <input class="form-input" type="text" value="" placeholder="" name="custom_field_${x}">
+        `
+        this.insertBefore(input, this.childNodes[this.children.length - 3])
+      }
+      if (e.target.type === "submit" && e.target.value === "Delete Feature") {
+        deleteFeature = true
+      }
+    })
 
     document.getElementById("edit").querySelector(".content").appendChild(form);
     window.location.hash = "#edit";
@@ -1034,10 +1053,10 @@ function mapInit(id, project, data) {
       toast.classList.add("toast-success");
       setTimeout(function () {
         toast.classList.remove("toast-active");
-      }, 5000);
+      }, 2000);
       setTimeout(function () {
         toast.classList.remove("toast-success");
-      }, 5200)
+      }, 2200)
     }
   }
 }

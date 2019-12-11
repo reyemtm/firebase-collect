@@ -19,6 +19,7 @@
     window.addEventListener('load', function() {
       navigator.serviceWorker.register('/sw.js').then(function(registration) {
         // Registration was successful
+      // Optionally, set 'scope' here, if needed.
         console.log('ServiceWorker registration successful with scope: ', registration.scope);
       }, function(err) {
         // registration failed :(
@@ -53,6 +54,8 @@
         </div>
 
         <div id="sidebarFooter">
+            Version 0.0.4<br>
+            <button id="updateApp" class="btn btn-sm btn-outline">Update App</button>
           <div id="position"></div>
         </div>
     </div>
@@ -122,7 +125,14 @@
       </div>
     </div>
   </div>
-
+  <script>
+    var updateButton = document.getElementById("updateApp");
+    updateButton.addEventListener("click", function() {
+      var random = (Math.random() * 1000);
+      var url = window.location.protocol + "//" + window.location.host + "/?" + random;
+      window.location.assign(url)
+    })
+  </script>
   <!-- Firebase App (the core Firebase SDK) is always required and must be listed first -->
   <script src="/__/firebase/7.5.2/firebase-app.js"></script>
 

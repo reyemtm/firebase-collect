@@ -77,12 +77,15 @@ export function dbWritePoint(database, coordinates, props, callback) {
 }
 
 export function dbWriteGeoJSON(layer, feature, key, callback) {
-  console.log(feature)
   if (key) {
-    //edit feature
     var db = firebase.database().ref().child(layer + '/' + key);
-    console.log(db)
-    db.set(feature, callback)
+    if (feature.delete) {
+      console.log(feature)
+      db.remove()
+      callback()
+    }else {
+      db.set(feature, callback)
+    }
   }else{
     //create new feature
     var db = firebase.database().ref().child(layer);
