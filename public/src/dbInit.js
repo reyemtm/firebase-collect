@@ -40,16 +40,16 @@ export function dbLogin(id) {
   document.getElementById(id).addEventListener("submit", function(e) {
     e.preventDefault();
     var inputs = this.getElementsByTagName("input");
-    firebase.auth().signInWithEmailAndPassword(inputs[0].value,inputs[1].value).catch(function (error) {
+    firebase.auth().signInWithEmailAndPassword(inputs[0].value,inputs[1].value)
+    .then(function() {
+      window.location.hash = "close"
+    })
+    .catch(function (error) {
       var errorCode = error.code;
       var errorMessage = error.message;
       alert("Wrong username or password, continuing as a Viewer Only. Refresh the page to try logging in again.");
       console.error(errorCode, errorMessage);
     })
-    // .then(function() {
-    //   console.log(firebase.auth().currentUser)
-    //   return firebase.auth().currentUser
-    // })
   })
 }
 

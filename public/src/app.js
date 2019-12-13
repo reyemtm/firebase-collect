@@ -212,6 +212,7 @@ function mapInit(id, project, data) {
   
   map.addControl(new mapboxgl.NavigationControl());
   map.addControl(new mapboxgl.FullscreenControl());
+  map.addControl(new appSettingsControl(), 'bottom-right')
 
   var gps = new mapboxgl.GeolocateControl({
     positionOptions: {
@@ -755,7 +756,7 @@ function mapInit(id, project, data) {
       this._btn.type = 'button';
       this._btn['aria-label'] = 'Download Data';
       this._btn.title = "Download Data"
-      this._btn.innerHTML = "<img src='https://icongr.am/material/file-download.svg'>";
+      this._btn.innerHTML = "<img src='/vendor/file-download.svg'>";
       this._btn.onclick = function () {
         var fileName = 'firebasePointsCollection.geojson';
 
@@ -1107,5 +1108,65 @@ function gpsAccuracyControl() {
   this.reset = function() {
     this._btn.style.backgroundColor = "white"
     this._btn.innerText = "0.00";
+  }
+}
+
+
+class appSettingsControl {
+  constructor() {
+    this.onAdd = function (m) {
+      this._btn = document.createElement('button');
+      this._btn.type = 'button';
+      this._btn['aria-label'] = 'App Settings';
+      this._btn.title = "App Settings";
+      this._btn.innerHTML = "<img src='/vendor/cog.svg'>";
+      this._btn.style.paddingTop = "2px";
+      this._btn.onclick = function () {
+        if (!document.getElementById("settingsModal")) {
+          var settingsModal = document.createElement("div");
+          settingsModal.id = "settingsModal";
+          settingsModal.classList = "modal";
+          settingsModal.innerHTML = `
+            <a href="#close" class="modal-overlay" aria-label="Close"></a>
+            <div class="modal-container">
+              <div class="modal-header">
+                <a href="#close" class="btn btn-clear float-right" aria-label="Close"></a>
+                <div class="modal-title h5">App Settings</div>
+              </div>
+              <div class="modal-body">
+                <div class="content">
+                <form>
+                  <div class="form-group">
+                    <label class="form-label" for="projectName">Project Name</label>
+                    <input class="form-input" id="projectName" type="text" placeholder="Name">
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">External GPS Use RTK Correction</label>
+                    <label class="form-radio form-inline">
+                      <input type="radio" name="rtk" checked=""><i class="form-icon"></i> Yes
+                    </label>
+                    <label class="form-radio form-inline">
+                      <input type="radio" name="rtk"><i class="form-icon"></i> No
+                    </label>
+                  </div>
+                </form>
+                </div>
+              </div>
+              <div class="modal-footer">
+              </div>
+            </div>`;
+          document.body.appendChild(settingsModal);
+        }
+        window.location.hash = "settingsModal";
+      };
+      this._container = document.createElement('div');
+      this._container.id = "settingsControl";
+      this._container.className = 'mapboxgl-ctrl mapboxgl-ctrl-group';
+      this._container.appendChild(this._btn);
+      return this._container;
+    };
+    this.onRemove = function (text) {
+      this._container.parentNode.removeChild(this._container);
+    };
   }
 }
