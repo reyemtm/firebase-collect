@@ -4,6 +4,16 @@ A simple GPS data collection app, for now based on Google's Firebase Realtime Da
 
 *To be used for testing only not to be used for production. Everything may change!*
 
+## Workflow
+
+1. Login/Add User
+2. Check for existing project in localstorage
+3. If project exists, load data
+4. If none exists, run settings modal
+5. Settings modal saves to localstorage and database
+6. If settings modal launched and changed, reload project data
+
+
 ## ToDo
 
 * [ ] Settings modal window that adjusts which project, tie in with login window

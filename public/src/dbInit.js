@@ -2,8 +2,6 @@ export function getJSON(config) {
   return fetch(config).then(res => res.json())
 }
 
-
-
 export function dbInit(user) {
 
   dbInitProject(user)
@@ -19,21 +17,14 @@ export function dbCheckUser(callback) {
 }
 
 export function dbAuth (dbLoginId, loginId, callback) {
-  var currentUser = firebase.auth().currentUser;
-  if (!currentUser) {
-    firebase.auth().onAuthStateChanged(function (user) {
-      if (user) {
-        var userId = firebase.auth().currentUser.uid;
-        console.log(`successfully logged in user ${userId}`);
-        if (callback) {
-          callback(userId)
-        }
-      } else {
-        window.location.hash = "#" + loginId
-        dbLogin(dbLoginId)
-      }
-    });
-  }
+  firebase.auth().onAuthStateChanged(function (user) {
+    if (user) {
+      callback(firebase.auth().currentUser.uid)
+    }else{
+      window.location.hash = "#" + loginId
+      dbLogin(dbLoginId)
+    }
+  })
 }
 
 export function dbLogin(id) {
@@ -58,6 +49,23 @@ export function dbGet(database) {
   .then(function (snapshot) {
     return snapshot.val();
   });
+}
+
+export function dbWriteNewProject(userId, projectId, callback) {
+  var projectsDb = firebase.database().ref().child("projects/" + userId);
+  var newProject = {};
+  newProject[projectId] = {
+    dateCreated: new Date()
+  }
+  projectsDb.update(newProject)
+  .then(success => console.log("success"))
+  .catch(err => console.log(err))
+
+  var userDb = firebase.database().ref().child("users/" + userId + "/projects");
+  userDb.update(newProject)
+  .then(success => console.log("success"))
+  .catch(err => console.log(err))
+
 }
 
 export function dbWritePoint(database, coordinates, props, callback) {
