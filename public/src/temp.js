@@ -49,13 +49,15 @@ export function initProject(userId, projectId, map) {
 
     var map = map;
 
-    const mapLayers = [];
+    let mapLayers = [];
 
     const pointFirebaseString = "projects/" + id + "/" + project + "/data/points";
     const lineFirebaseString = "projects/" + id + "/" + project + "/data/lines";
 
-    var points = (!data || !data.points) ? turf.featureCollection([]) : dbToGeoJSON(data.points);
-    var lines = (!data || !data.lines) ? turf.featureCollection([]) : dbToGeoJSON(data.lines);
+    var points = {};
+    points = (!data || !data.points) ? turf.featureCollection([]) : dbToGeoJSON(data.points);
+    var lines = {};
+    lines = (!data || !data.lines) ? turf.featureCollection([]) : dbToGeoJSON(data.lines);
 
     var featureSelected = {};
     var featureAdded = false;
@@ -401,6 +403,7 @@ export function initProject(userId, projectId, map) {
       },
       {
         "id": "projectPoints",
+        "name": "Collected Points",
         "type": "circle",
         "source": "projectPoints",
         "minzoom": 4,
@@ -487,15 +490,30 @@ export function initProject(userId, projectId, map) {
       trackUserLocation: true,
       maxZoom: 22
     });
-    map.addControl(gps)
 
-    document.getElementById("mapToolbarBottom").appendChild((new locationControl()).onAdd(map));
-    document.getElementById("mapToolbarBottom").appendChild((new addPointControl()).onAdd(map));
-    document.getElementById("mapToolbarBottom").appendChild((new pointConnectControl()).onAdd(map));
+    if (!document.querySelector(".mapboxgl-ctrl-geolocate")) {
+      map.addControl(gps)
+    }
 
-    var accuracyControl = new gpsAccuracyControl()
-    map.addControl(accuracyControl, "top-left");
-    map.addControl(new dataDownloadControl());
+    if (document.getElementById("mapToolbarBottom").childElementCount != 3) {
+      document.getElementById("mapToolbarBottom").appendChild((new locationControl()).onAdd(map));
+      document.getElementById("mapToolbarBottom").appendChild((new addPointControl()).onAdd(map));
+      document.getElementById("mapToolbarBottom").appendChild((new pointConnectControl()).onAdd(map));
+    }
+
+    if (!document.querySelector(".mapboxgl-ctrl-accuracy")) {
+      var accuracyControl = new gpsAccuracyControl()
+      map.addControl(accuracyControl, "top-left");
+    }
+    if (!document.querySelector(".mapboxgl-ctrl-download")) {
+      map.addControl(new dataDownloadControl());
+    }
+
+    /*--------------------------*/
+    /* MAP IS DONE LOADING DATA AND ADDING CONTROLS */
+    document.querySelector("#loading").style.display = "none";
+    /*--------------------------*/
+    /*--------------------------*/
 
     var gpsAccuracy = document.getElementById("position");
 
@@ -537,7 +555,7 @@ export function initProject(userId, projectId, map) {
       accuracyControl.reset()
     })
 
-    map.on('click', mapGetInfo)
+    map.on("click", mapGetInfo)
 
     function mapGetInfo(e) {
       featureSelected = blank;
@@ -644,13 +662,18 @@ export function initProject(userId, projectId, map) {
       this.onAdd = function (m) {
         this._btn = document.createElement('button');
         this._btn.type = 'button';
-        this._btn['aria-label'] = 'Download Data';
-        this._btn.title = "Download Data"
+        
+        var title = 'Download Data in WGS84'
+        this._btn['aria-label'] = title;
+        this._btn.title = title;
+        this._btn.classList = "tooltip tooltip-left mapboxgl-ctrl-download"
+        this._btn.dataset.tooltip = title;
+
         this._btn.innerHTML = "<img src='/vendor/file-download.svg'>";
         this._btn.onclick = function () {
           var fileName = 'firebasePointsCollection.geojson';
 
-          var fileToSave = new Blob([JSON.stringify(points)], {
+          var fileToSave = new Blob([JSON.stringify(points,0,2)], {
             type: 'application/json',
             name: fileName
           });
@@ -768,18 +791,18 @@ export function initProject(userId, projectId, map) {
       }
     }
 
-    document.querySelector(".btn-clear").addEventListener("click", function () {
-      this.parentElement.children[2].innerHTML = "";
-      this.parentElement.classList.remove("toast-active");
-      this.parentElement.classList.remove("toast-full");
-      if (document.getElementById("pointConnectControl") && document.getElementById("pointConnectControl").children[0].classList.contains("active")) {
-        document.getElementById("pointConnectControl").children[0].click();
-      }
-    })
+    // document.querySelector(".btn-clear").addEventListener("click", function () {
+    //   this.parentElement.children[2].innerHTML = "";
+    //   this.parentElement.classList.remove("toast-active");
+    //   this.parentElement.classList.remove("toast-full");
+    //   if (document.getElementById("pointConnectControl") && document.getElementById("pointConnectControl").children[0].classList.contains("active")) {
+    //     document.getElementById("pointConnectControl").children[0].click();
+    //   }
+    // })
 
-    document.querySelector(".btn-expand").addEventListener("click", function () {
-      this.parentElement.classList.add("toast-full");
-    })
+    // document.querySelector(".btn-expand").addEventListener("click", function () {
+    //   this.parentElement.classList.add("toast-full");
+    // })
 
 
     function featureEditFormBuilder(feature) {
@@ -887,14 +910,15 @@ export function initProject(userId, projectId, map) {
 
       form.addEventListener("click", function (e) {
         if (e.target.type === "button" || e.target.classList.contains("icon-plus")) {
-          var x = this.children.length - 2;
+          var x = this.children.length - 6;
+          console.log(x)
           var input = document.createElement("div");
           input.classList = "form-group";
           input.innerHTML = `
             <label class="form-label" for="custom_field_${x}">Custom Field ${x}</label>
             <input class="form-input" type="text" value="" placeholder="" name="custom_field_${x}">
           `
-          this.insertBefore(input, this.childNodes[this.children.length - 3])
+          this.insertBefore(input, this.childNodes[this.children.length - 7])
         }
         if (e.target.type === "submit" && e.target.value === "Delete Feature") {
           deleteFeature = true

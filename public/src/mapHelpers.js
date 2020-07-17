@@ -3,8 +3,15 @@ export class layerControl {
   constructor(map, id, layers) {
     var lcMap = map;
     var lc = document.getElementById(id);
+    lc.innerHTML = "";
+    
     for (var i = 0; i < layers.length; i++) {
       lcMap.addLayer(layers[i]);
+    }
+
+    layers.reverse()
+
+    for (var i = 0; i < layers.length; i++) {
 
       mapChangeCursorOnHover(lcMap, layers[i].id)
 
@@ -61,7 +68,7 @@ export class gpsAccuracyControl {
       }
       this._container = document.createElement('div');
       this._container.id = "accuracyControl";
-      this._container.className = 'mapboxgl-ctrl mapboxgl-ctrl-group';
+      this._container.className = 'mapboxgl-ctrl mapboxgl-ctrl-group mapboxgl-ctrl-accuracy';
       this._container.appendChild(this._btn);
       return this._container;
     }
@@ -121,7 +128,7 @@ export class appSettingsControl {
                     </label>
                   </div>
                   <div class="form-group">
-                    <button class="btn btn-primary" type="submit" style="width:100%">Launch Project</button>
+                    <button id="oc-project-settings-form-submit" class="btn btn-primary" type="submit" style="width:100%">Launch Project</button>
                   </div>
                 </form>
                 </div>
@@ -133,13 +140,30 @@ export class appSettingsControl {
           if (localStorage.getItem("oc-project")) {
            document.querySelector("#name").value = localStorage.getItem("oc-project")   
           }
+          var regex = new RegExp(/^[_A-z0-9]*((-|\s)*[_A-z0-9])*$/);
+
+          document.querySelector("#name").addEventListener("input", function() {
+
+            if (!regex.test(this.value) || !this.value) {
+              this.classList.add("is-error");
+              document.querySelector("#oc-project-settings-form-submit").disabled = true
+            }else{
+              this.classList.remove("is-error")
+              this.classList.add("is-success");
+              document.querySelector("#oc-project-settings-form-submit").disabled = false
+            }
+          })
+
           document.querySelector("#ocProjectSettingsForm").addEventListener("submit", function(e) {
             e.preventDefault();
             
             var settings = new FormData(document.getElementById("ocProjectSettingsForm"))
             console.log(settings.get("name"), settings.get("rtk"))
-            //TODO RELOAD MAP IF PROJECT NAME IS NOT THE ONE SAVED IN LOCALSTORAGE
-            localStorage.setItem("oc-project", settings.get("name"))
+            if (!regex.test(settings.get("name"))) {
+              return
+            }
+            localStorage.setItem("oc-project", settings.get("name").toLocaleLowerCase().replace(" ", "_"));
+            window.location.reload()
           })
         }
         window.location.hash = "settingsModal";
@@ -165,6 +189,7 @@ export function mapSetup() {
   console.log(keys, values)
   var str = "dark";
   var style = (values.indexOf(str) > -1) ? "mapbox://styles/cozgis/cjwmext6m123v1dmznevlle1p" : "mapbox://styles/cozgis/cjvpkkmf211dt1dplro55m535";
+  localStorage.setItem("oc-map-style", style)
 
   mapboxgl.accessToken = "pk.eyJ1IjoiY296Z2lzIiwiYSI6ImNqZ21lN2R5ZDFlYm8ycXQ0a3R2cmI2NWgifQ.z4GxUZe5JXAdoRR4E3mvpg";
 

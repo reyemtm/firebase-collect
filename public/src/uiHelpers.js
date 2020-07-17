@@ -9,6 +9,10 @@ export class Modals {
 export class Toast {
   constructor() {
     this.create = function () {
+      if (document.querySelector(".toast")) {
+        this.show("The toast button has already been created!");
+        return
+      }
       const toast = document.createElement("div");
       toast.classList = "toast text-center toast-primary"
       toast.innerHTML = `

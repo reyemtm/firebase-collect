@@ -1,3 +1,8 @@
+//TODO ADD CLEAR OLD PROJECT DATA AND LOAD NEW PROJECT DATA WHEN CHANGING PROJECT IN SETTINGS BUTTON
+//TODO ADD LOCATION MARKER IN CORRECT PLACE IF RTK
+//TODO ADD EDIT LINE FEATURES
+//TODO ADD OPTION TO ADD PHOTO OR PHOTOS
+
 import {
   dbInit,
   dbLogin,
@@ -31,43 +36,26 @@ var modals = new Modals();
 var toast = new Toast();
 toast.create();
 
-/*
-getProjectId or putProjectId
-getProjectData
-mapInit
-*/
-
 //WAIT FOR USER TO LOGIN
 dbAuth("dbLoginForm", "login", init)
 
 //INITIALIZE PROJECT WITH USERID FROM FIREBASE
 function init(user) {
 
-  //SET PROJECT TO LAST PROJECT SAVED
-  if (!localStorage.getItem("oc-project")) {
-    localStorage.setItem("oc-project", null);
-    toast.show("Please create a project with the settings button.");
-  }else{
-    console.log(localStorage.getItem("oc-project"))
-  }
-
   //LAUNCH MAP
   var projectMap = mapSetup();
 
-  //WAIT FOR MAP TO LOAD, OPEN SETTINGS TO CONFIRM PROJECT SELECTION
-  //ON FORM SAVE
+  //ADD LISTENER TO LOAD A DIFFERENT PROJECT
   projectMap.on("load", function() {
-    document.querySelector("#loading").style.display = "none";
 
     //TODO ADD OPTION TO SELECT PROJECTS
     //TODO ADD OPTION TO SELECT ADDITIONAL LAYERS FOR PROJECT - THESE SHOULD ALL BE DEFINED IN A LAYERS CONTROL JSON FILE
 
-    document.querySelector("#settingsControl").children[0].click();
-    document.querySelector("#ocProjectSettingsForm").addEventListener("submit", function() {
-      initProject(user, this.querySelector("#name").value, projectMap);
-      //TODO TURN THIS INTO MODALS.CLOSE()
-      modals.close()
-    })
+    if (!localStorage.getItem("oc-project")) {
+      document.querySelector("#settingsControl").children[0].click();
+    }else{
+      initProject(user, localStorage.getItem("oc-project"), projectMap);
+    }
   })
 
 }

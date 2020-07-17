@@ -55,7 +55,7 @@ export function dbWriteNewProject(userId, projectId, callback) {
   var projectsDb = firebase.database().ref().child("projects/" + userId);
   var newProject = {};
   newProject[projectId] = {
-    dateCreated: new Date()
+    date_created: new Date()
   }
   projectsDb.update(newProject)
   .then(success => console.log("success"))
