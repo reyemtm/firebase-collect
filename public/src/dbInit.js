@@ -63,7 +63,10 @@ export function dbWriteNewProject(userId, projectId, callback) {
 
   var userDb = firebase.database().ref().child("users/" + userId + "/projects");
   userDb.update(newProject)
-  .then(success => console.log("success"))
+  .then(success => {
+    console.log("new project created") //TODO MAKE THIS INTO A TOAST
+    callback()
+  })
   .catch(err => console.log(err))
 
 }

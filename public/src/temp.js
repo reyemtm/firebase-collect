@@ -14,6 +14,14 @@ import {
   Toast
 } from "./uiHelpers.js"
 
+function loadingStop() {
+  if (document.getElementById("loading")) document.getElementById("loading").style.display = "none";
+}
+
+function loadingStart() {
+  if (document.getElementById("loading")) document.getElementById("loading").style.display = "block";
+}
+
 export function initProject(userId, projectId, map) {
 
   const toast = new Toast();
@@ -28,7 +36,9 @@ export function initProject(userId, projectId, map) {
         if (projects.indexOf(projectId) > -1) {
           getProjectData(userId, projectId)
         } else {
-          dbWriteNewProject(userId, projectId)
+          dbWriteNewProject(userId, projectId, function() {
+            
+          })
         }
       })
   }
@@ -196,7 +206,7 @@ export function initProject(userId, projectId, map) {
         .then(function (data) {
           var geojson = dbToGeoJSON(data)
           map.getSource(source).setData(geojson)
-          if (document.getElementById("loading")) document.getElementById("loading").style.display = "none";
+          loadingStop()
         })
     }
 
@@ -263,7 +273,7 @@ export function initProject(userId, projectId, map) {
           "type": "geojson",
           "data": "https://311.coz.org/data/geojson/utl_sanitary_lines.geojson"
         },
-        "name": "Reference Lines Case",
+        "name": "Sewer Lines Case",
         "minzoom": 12,
         "paint": {
           "line-color": "white",
@@ -276,7 +286,7 @@ export function initProject(userId, projectId, map) {
           }
         },
         "layout": {
-          "visibility": "visible"
+          "visibility": "none"
         }
       },
       {
@@ -286,7 +296,7 @@ export function initProject(userId, projectId, map) {
           "type": "geojson",
           "data": "https://311.coz.org/data/geojson/utl_sanitary_lines.geojson"
         },
-        "name": "Reference Lines",
+        "name": "Sewer Lines",
         "minzoom": 12,
         "paint": {
           "line-color": "green",
@@ -299,7 +309,7 @@ export function initProject(userId, projectId, map) {
           }
         },
         "layout": {
-          "visibility": "visible"
+          "visibility": "none"
         }
       },
       {
@@ -309,7 +319,7 @@ export function initProject(userId, projectId, map) {
           "type": "geojson",
           "data": "https://311.coz.org/data/geojson/utl_sanitary_points.geojson"
         },
-        "name": "Reference Points",
+        "name": "Sewer Points",
         "minzoom": 12,
         "paint": {
           "circle-color": "green",
@@ -330,7 +340,7 @@ export function initProject(userId, projectId, map) {
           "circle-blur": 0
         },
         "layout": {
-          "visibility": "visible"
+          "visibility": "none"
         }
       },
       {
@@ -511,7 +521,7 @@ export function initProject(userId, projectId, map) {
 
     /*--------------------------*/
     /* MAP IS DONE LOADING DATA AND ADDING CONTROLS */
-    document.querySelector("#loading").style.display = "none";
+    loadingStop()
     /*--------------------------*/
     /*--------------------------*/
 
@@ -612,7 +622,7 @@ export function initProject(userId, projectId, map) {
       if (!coords) return
 
       var positionAccuracy = (!position.coords) ? 9999 : (position.coords.accuracy * 3.28084).toFixed(2);
-      if (document.getElementById("loading")) document.getElementById("loading").style.display = "none";
+      loadingStop()
       if (positionAccuracy > 0 && positionAccuracy < 20000) {
         var date = Date.now();
         var isoDateEdited = new Date(date).toISOString();
@@ -862,7 +872,8 @@ export function initProject(userId, projectId, map) {
       button.classList = "btn btn-outline form-input";
       button.type = "button"
       button.innerHTML = '<i class="icon icon-plus"></i>';
-      button.style.marginTop = "20px"
+      button.style.marginTop = "20px";
+      button.style.opacity = 0.5;
 
       form.appendChild(button);
 
@@ -939,7 +950,7 @@ export function initProject(userId, projectId, map) {
       } else {
         featureAdded = true;
         console.log("write complete");
-        if (document.getElementById("loading")) document.getElementById("loading").style.display = "none";
+        loadingStop()
         window.location.hash = "#success";
         toast.show("Feature Saved");
         toast.success();
@@ -970,7 +981,7 @@ export function initProject(userId, projectId, map) {
         this._btn.style = 'width:2.4rem;height:2.4rem;'
         this._btn.innerHTML = '<i class="icon icon-plus"></i>'
         this._btn.onclick = function () {
-          if (document.getElementById("loading")) document.getElementById("loading").style.display = "block";
+          loadingStart();
 
           getLocation();
 
@@ -987,7 +998,7 @@ export function initProject(userId, projectId, map) {
           }
 
           function locationError(error) {
-            if (document.getElementById("loading")) document.getElementById("loading").style.display = "none";
+            loadingStop();
             console.log(error)
           }
 

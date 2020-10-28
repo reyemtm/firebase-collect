@@ -202,7 +202,7 @@ export function mapSetup() {
   });
   
   map.addControl(new mapboxgl.NavigationControl());
-  map.addControl(new mapboxgl.FullscreenControl());
+  // map.addControl(new mapboxgl.FullscreenControl());
   map.addControl(new appSettingsControl(), 'bottom-right');
 
   return map
