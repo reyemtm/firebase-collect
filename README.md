@@ -4,6 +4,8 @@ A simple GPS data collection app, for now based on Google's Firebase Realtime Da
 
 *To be used for testing only not to be used for production. Everything may change!*
 
+![](screenshot.png)
+
 ## Workflow
 
 1. Login/Add User
